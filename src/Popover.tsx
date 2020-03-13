@@ -201,20 +201,20 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     return { x: anchor.x - popoverCenter.x, y: anchor.y - popoverCenter.y };
   };
 
-  componentWillReceiveProps(nextProps: PopoverProps) {
-    const willBeVisible = nextProps.visible;
+  componentDidUpdate(prevProps: PopoverProps) {
     const { visible, fromRect, displayArea } = this.props;
+    const { visible:wasVisible, fromRect:wasfromRect, displayArea:wasDisplayArea } = prevProps;
 
-    if (willBeVisible !== visible) {
-      if (willBeVisible) {
+    if (visible !== wasVisible) {
+      if (visible) {
         // We want to start the show animation only when contentSize is known
         // so that we can have some logic depending on the geometry
         this.setState({ contentSize: { width: 0, height: 0 }, isAwaitingShow: true, visible: true });
       } else {
         this.startAnimation(false);
       }
-    } else if (willBeVisible && (fromRect !== nextProps.fromRect || displayArea !== nextProps.displayArea)) {
-      const geom = this.computeGeometry(nextProps, this.state.contentSize);
+    } else if (visible && (wasfromRect !== fromRect || wasDisplayArea !== displayArea)) {
+      const geom = this.computeGeometry(this.props, this.state.contentSize);
 
       const isAwaitingShow = this.state.isAwaitingShow;
       this.setState({ ...geom }, () => {
